@@ -141,7 +141,7 @@
                             <local:MyComboBoxItem local:SettingService.Value="5" Content="很大" />
                         </local:MyComboBox>
                     </Grid>
-                    <TextBlock Text="点击启动器窗口任意位置可触发星星迸发特效；特效可能导致低性能设备卡顿，帧率过低时会自动减少粒子。选择“星空”等主题可体验对应的动态特效。" TextWrapping="Wrap" Foreground="{StaticResource ColorBrushGray3}" FontSize="12.5" />
+                    <TextBlock Text="点击启动器窗口任意位置可触发星星迸发特效；特效可能导致低性能设备卡顿，帧率过低时会自动减少粒子。星空/原神带流星与深空夜幕，四季随系统日期自动切换物候（春樱/夏萤/秋枫/冬雪），娱乐为彩虹气球。把角色立绘图片放入 PCL\Pictures\主题立绘\原神（或星空/四季/娱乐）文件夹，主题会自动展示立绘。" TextWrapping="Wrap" Foreground="{StaticResource ColorBrushGray3}" FontSize="12.5" />
                 </StackPanel>
             </local:MyCard>
             <local:MyCard x:Name="CardBackground" Margin="0,0,0,15" Title="背景图片">

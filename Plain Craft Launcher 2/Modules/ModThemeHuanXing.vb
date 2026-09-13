@@ -3,14 +3,14 @@ Imports System.Windows.Threading
 ''' <summary>
 ''' 幻星修改版：主题预设与特效调度。
 ''' 说明：官方开源仓库中的 主题ID→色相 映射位于被移除的闭源代码内，本模块在开源框架上
-''' 重新实现该映射（0-4 为按官方观感还原的近似值），并新增 原神/星空/四季/娱乐 四个预设，
-''' 同时接通自定义主题（ID 14）的滑块参数。所有预设均可免费使用。
+''' 重新实现全部主题的映射（0-13 为按官方观感还原的近似值），并新增 原神/星空/四季/娱乐
+''' 四个预设，同时接通自定义主题（ID 14）的滑块参数。修改版内所有主题免费开放。
 ''' </summary>
 Friend Module ModThemeHuanXing
 
 #Region "主题 ID"
 
-    Public Const ThemeGenshinId As Integer = 15 '原神 · 流金
+    Public Const ThemeGenshinId As Integer = 15 '原神 · 星穹夜空
     Public Const ThemeStarId As Integer = 16    '星空 · 深空
     Public Const ThemeSeasonId As Integer = 17  '四季 · 流转
     Public Const ThemeFunId As Integer = 18     '娱乐 · 彩虹
@@ -30,6 +30,28 @@ Friend Module ModThemeHuanXing
                 SetHue(48, 88, 0, 0) '菠萝黄
             Case 4
                 SetHue(27, 48, -4, 0) '橡木棕
+            Case 5
+                SetHue(215, 8, -16, 0) '玄素黑
+            Case 6
+                SetHue(328, 78, 0, 0) '铁杆粉
+            Case 7
+                SetHue(282, 68, 0, 0) '神秘紫
+            Case 8
+                SetHue(43, 88, 0, 8) '秋仪金
+            Case 9
+                SetHue(24, 88, 0, 0) '活跃橙
+            Case 10
+                SetHue(4, 78, 0, 0) '跳票红
+            Case 11
+                SetHue(222, 76, -2, 0) '极客蓝
+            Case 12
+                '滑稽彩：色相循环（由主时钟每 250ms 调用 ThemeRefresh 推进），彩虹背景 + 娱乐特效
+                ColorHue = (ColorHue + 3) Mod 361
+                ColorSat = 85
+                ColorLightAdjust = 0
+                ColorHueTopbarDelta = 25
+            Case 13
+                SetHue(48, 92, 2, 8) '欧皇金
             Case 14
                 '自定义：读取个性化页四个滑块的实时取值（20/90 为滑块的中性位）
                 ColorHue = Settings.Get(Of Integer)("UiLauncherHue")
@@ -37,7 +59,7 @@ Friend Module ModThemeHuanXing
                 ColorLightAdjust = Settings.Get(Of Integer)("UiLauncherLight") - 20
                 ColorHueTopbarDelta = Settings.Get(Of Integer)("UiLauncherDelta") - 90
             Case ThemeGenshinId
-                SetHue(45, 72, 0, 14) '原神 · 流金
+                SetHue(45, 72, 0, 14) '原神 · 星穹夜空 + 金色点缀
             Case ThemeStarId
                 SetHue(232, 65, -2, 0) '星空 · 深空蓝
             Case ThemeSeasonId
@@ -58,6 +80,7 @@ Friend Module ModThemeHuanXing
         ModThemeFx.FxStyle = StyleFor(Id)
         If Id = ThemeSeasonId Then ModThemeFx.SeasonMode = SeasonNow()
         ModThemeFx.FxRefresh()
+        If Id = ThemeFunId OrElse Id = 12 Then ModThemeFx.RainbowBgTick()
     End Sub
 
     Private Sub SetHue(Hue As Integer, Sat As Integer, LightAdjust As Integer, TopbarDelta As Integer)
@@ -73,14 +96,14 @@ Friend Module ModThemeHuanXing
             Case ThemeGenshinId : Return 4
             Case ThemeStarId : Return 2
             Case ThemeSeasonId : Return 3
-            Case ThemeFunId : Return 5
+            Case ThemeFunId, 12 : Return 5
             Case Else : Return 0
         End Select
     End Function
 
 #Region "四季"
 
-    ''' <summary>当前季节：1 春 2 夏 3 秋 4 冬。</summary>
+    ''' <summary>当前季节：1 春 2 夏 3 秋 4 冬（按系统日期的月份自动判定）。</summary>
     Public Function SeasonNow() As Integer
         Select Case Date.Now.Month
             Case 3 To 5 : Return 1

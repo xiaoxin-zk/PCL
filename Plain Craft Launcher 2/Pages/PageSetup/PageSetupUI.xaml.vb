@@ -36,8 +36,32 @@ Public Class PageSetupUI
         If Not RadioLauncherTheme9.IsEnabled Then LabLauncherTheme9Copy.ToolTip = "· 反馈一个 Bug，在标记为 [完成] 后回复识别码要求解锁（右键打开反馈页面）" & vbCrLf & "· 提交一个 Pull Request 或主页预设，在标记为 [完成] 后回复识别码要求解锁"
         RadioLauncherTheme9.ToolTip = "· 反馈一个 Bug，在标记为 [完成] 后回复识别码要求解锁" & vbCrLf & "· 提交一个 Pull Request 或主页预设，在标记为 [完成] 后回复识别码要求解锁"
         '极客蓝的处理在 ThemeCheck 中
-        '幻星修改版：自定义主题免费开放，无需解锁隐藏主题
+        '幻星修改版：依据开源协议，修改版不设赞助解锁，全部内置主题免费开放（色相为修改版自行实现的近似还原）
+        RadioLauncherTheme5.IsEnabled = True
+        RadioLauncherTheme5.Opacity = 1
+        RadioLauncherTheme5Gray.Visibility = Visibility.Collapsed
+        LabLauncherTheme5Unlock.Visibility = Visibility.Collapsed
+        RadioLauncherTheme6.IsEnabled = True
+        RadioLauncherTheme7.IsEnabled = True
+        RadioLauncherTheme8.IsEnabled = True
+        LabLauncherTheme8Copy.Visibility = Visibility.Collapsed
+        RadioLauncherTheme9.IsEnabled = True
+        LabLauncherTheme9Copy.Visibility = Visibility.Collapsed
+        RadioLauncherTheme10.IsEnabled = True
+        RadioLauncherTheme11.IsEnabled = True
+        LabLauncherTheme11Click.Visibility = Visibility.Collapsed
+        RadioLauncherTheme12.IsEnabled = True
+        RadioLauncherTheme13.IsEnabled = True
         RadioLauncherTheme14.IsEnabled = True
+        RadioLauncherTheme5.ToolTip = "灰色是个谎言（幻星修改版已免费解锁）"
+        RadioLauncherTheme6.ToolTip = "99 次重逢的喜悦（幻星修改版已免费解锁）"
+        RadioLauncherTheme7.ToolTip = "属于开发者的深紫色（幻星修改版已免费解锁）"
+        RadioLauncherTheme8.ToolTip = "温暖明亮的天金色（幻星修改版已免费解锁）"
+        RadioLauncherTheme9.ToolTip = "活力满满的橙色调（幻星修改版已免费解锁）"
+        RadioLauncherTheme10.ToolTip = "属于正版玩家的红色（幻星修改版已免费解锁）"
+        RadioLauncherTheme11.ToolTip = "冷静沉稳的深蓝（幻星修改版已免费解锁）"
+        RadioLauncherTheme12.ToolTip = "滑稽树上滑稽果，滑稽树下你和我（幻星修改版已免费解锁）"
+        RadioLauncherTheme13.ToolTip = "这就是传说中的欧皇了吧（幻星修改版已免费解锁）"
         RadioLauncherTheme14.ToolTip = "自由调节色调、饱和度与亮度，属于你的专属主题"
 
     End Sub
