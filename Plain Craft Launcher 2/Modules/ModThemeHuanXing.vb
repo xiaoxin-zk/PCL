@@ -81,7 +81,42 @@ Friend Module ModThemeHuanXing
         If Id = ThemeSeasonId Then ModThemeFx.SeasonMode = SeasonNow()
         ModThemeFx.FxRefresh()
         If Id = ThemeFunId OrElse Id = 12 Then ModThemeFx.RainbowBgTick()
+        ApplyCardBorder(Id)
     End Sub
+
+#Region "卡片描边"
+
+    ''' <summary>为主题设置卡片描边颜色：新增主题与四季着色以形成辨识度，官方主题保持透明（观感不变）。</summary>
+    Private Sub ApplyCardBorder(Id As Integer)
+        Try
+            If Application.Current Is Nothing Then Return
+            Dim Brush As Brush = Brushes.Transparent
+            Select Case Id
+                Case ThemeGenshinId : Brush = FrozenBorder(Color.FromArgb(175, 205, 173, 98)) '原神 · 鎏金
+                Case ThemeStarId : Brush = FrozenBorder(Color.FromArgb(150, 104, 126, 188)) '星空 · 深蓝
+                Case ThemeSeasonId
+                    Select Case SeasonNow()
+                        Case 1 : Brush = FrozenBorder(Color.FromArgb(140, 242, 170, 192)) '春 · 樱粉
+                        Case 2 : Brush = FrozenBorder(Color.FromArgb(140, 126, 208, 232)) '夏 · 水色
+                        Case 3 : Brush = FrozenBorder(Color.FromArgb(140, 238, 168, 82)) '秋 · 枫橙
+                        Case Else : Brush = FrozenBorder(Color.FromArgb(140, 170, 202, 238)) '冬 · 霜蓝
+                    End Select
+                Case ThemeFunId, 12
+                    Brush = ModThemeFx.MakeRainbowBorder(ColorHue) '娱乐 / 滑稽彩 · 彩虹
+            End Select
+            Application.Current.Resources("ColorBrushCardBorderFx") = Brush
+        Catch ex As Exception
+            Logger.Error(ex, "主题卡片描边更新失败")
+        End Try
+    End Sub
+
+    Private Function FrozenBorder(Col As Color) As SolidColorBrush
+        Dim Brush As New SolidColorBrush(Col)
+        Brush.Freeze()
+        Return Brush
+    End Function
+
+#End Region
 
     Private Sub SetHue(Hue As Integer, Sat As Integer, LightAdjust As Integer, TopbarDelta As Integer)
         ColorHue = Hue

@@ -40,6 +40,8 @@
             <Color x:Key="ColorObjectBg0">#96c0f9</Color>
             <Color x:Key="ColorObjectBg1">#bee0eafd</Color>
             <SolidColorBrush x:Key="ColorBrushGray1">#404040</SolidColorBrush>
+            <!-- 幻星修改版：主题卡片边框（默认透明，主题切换时由 ModThemeHuanXing 动态着色） -->
+            <SolidColorBrush x:Key="ColorBrushCardBorderFx">#00FFFFFF</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushGray2">#737373</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushGray3">#8c8c8c</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushGray4">#a6a6a6</SolidColorBrush>

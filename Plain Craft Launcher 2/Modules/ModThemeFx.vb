@@ -74,6 +74,12 @@ Friend Module ModThemeFx
     Private SizeScale As Double = 1.0
 
     Private ThemeArt As Image = Nothing '主题立绘
+    Private LastArtStyle As Integer = -2 '上次加载立绘时的风格（-2 强制下次重载）
+    Private ArtAppear As Double = 1 '立绘入场进度 0→1
+    Private FrameDt As Double = 0.016
+    ''' <summary>每个主题记住选中的立绘文件，避免切换主题后重新随机导致图片变化。</summary>
+    Private ReadOnly ArtPicks As New Dictionary(Of String, String)
+    Private ReadOnly ArtHintDone As New HashSet(Of String)
 
     '形状几何（懒加载并冻结）
     Private GeoStar As Geometry = Nothing, GeoPetal As Geometry = Nothing, GeoSnow As Geometry = Nothing
@@ -107,13 +113,24 @@ Friend Module ModThemeFx
         Sub()
             Try
                 If FxStyle <> 5 OrElse FxCanvas Is Nothing OrElse FxCanvas.Parent Is Nothing Then Return
-                If HasWallpaper() Then Return
-                FxCanvas.Background = MakeRainbowBackground(ColorHue)
+                If Not HasWallpaper() Then FxCanvas.Background = MakeRainbowBackground(ColorHue)
+                If Application.Current IsNot Nothing Then Application.Current.Resources("ColorBrushCardBorderFx") = MakeRainbowBorder(ColorHue)
             Catch ex As Exception
                 Logger.Error(ex, "幻星特效彩虹背景更新失败")
             End Try
         End Sub)
     End Sub
+
+    ''' <summary>彩虹主题的卡片描边渐变（随色相循环变化）。</summary>
+    Public Function MakeRainbowBorder(BaseHue As Integer) As Brush
+        Dim Brush As New LinearGradientBrush With {.StartPoint = New Point(0, 0), .EndPoint = New Point(1, 0.2)}
+        For i = 0 To 3
+            Dim Col = CType(New MyColor().FromHSL2((BaseHue + i * 90) Mod 361, 58, 62), Color)
+            Brush.GradientStops.Add(New GradientStop With {.Color = Color.FromArgb(190, Col.R, Col.G, Col.B), .Offset = i / 3.0})
+        Next
+        Brush.Freeze()
+        Return Brush
+    End Function
 
 #End Region
 
@@ -171,12 +188,14 @@ Friend Module ModThemeFx
 
 #Region "主题立绘"
 
-    ''' <summary>加载主题立绘：PCL\Pictures\主题立绘\ 主题名 文件夹下的随机图片。</summary>
+    ''' <summary>加载主题立绘：PCL\Pictures\主题立绘\ 主题名 文件夹下的随机图片（同一主题记住同一张）。</summary>
     Private Sub SetupThemeArt()
+        If FxStyle = LastArtStyle Then Return '主题未切换时不重载，避免闪烁与换图
         If ThemeArt IsNot Nothing Then
             FxCanvas.Children.Remove(ThemeArt)
             ThemeArt = Nothing
         End If
+        LastArtStyle = FxStyle
         Dim Name As String = ""
         Select Case FxStyle
             Case 4 : Name = "原神"
@@ -187,23 +206,68 @@ Friend Module ModThemeFx
         End Select
         Try
             Dim DirPath = Paths.Base & "PCL\Pictures\主题立绘\" & Name & "\"
-            If Not Directory.Exists(DirPath) Then Return
+            If Not Directory.Exists(DirPath) Then
+                WriteArtHint()
+                Return
+            End If
             Dim Valid As New List(Of String)
             For Each File In Directory.GetFiles(DirPath)
                 Dim Ext = IO.Path.GetExtension(File).ToLower()
                 If Ext = ".png" OrElse Ext = ".jpg" OrElse Ext = ".jpeg" OrElse Ext = ".bmp" OrElse Ext = ".webp" Then Valid.Add(File)
             Next
-            If Valid.Count = 0 Then Return
+            If Valid.Count = 0 Then
+                WriteArtHint()
+                Return
+            End If
+            '稳定选图：同一主题记住同一张，切换主题来回不会换图
+            Dim Picked As String = Nothing
+            If ArtPicks.ContainsKey(Name) AndAlso IO.File.Exists(ArtPicks(Name)) Then
+                Picked = ArtPicks(Name)
+            Else
+                Picked = Valid(Rand.Next(Valid.Count))
+                ArtPicks(Name) = Picked
+            End If
             Dim Bmp As New BitmapImage
             Bmp.BeginInit()
             Bmp.CacheOption = BitmapCacheOption.OnLoad
-            Bmp.UriSource = New Uri(Valid(Rand.Next(Valid.Count)))
+            Bmp.UriSource = New Uri(Picked)
             Bmp.EndInit()
             Bmp.Freeze()
-            ThemeArt = New Image With {.Source = Bmp, .IsHitTestVisible = False, .Opacity = 0.97}
+            ThemeArt = New Image With {.Source = Bmp, .IsHitTestVisible = False, .Opacity = 0}
+            ThemeArt.RenderTransformOrigin = New Point(0.5, 0.88) '摇摆轴心靠近底部
+            ThemeArt.RenderTransform = New RotateTransform(0)
             FxCanvas.Children.Insert(0, ThemeArt) '立绘在最底层：背景之上、粒子之下
+            ArtAppear = 0 '播放入场动画
         Catch ex As Exception
             Logger.Error(ex, "加载主题立绘失败")
+        End Try
+    End Sub
+
+    ''' <summary>立绘文件夹为空时自动写入图片要求说明，方便使用者按规格添加。</summary>
+    Private Sub WriteArtHint()
+        If ArtHintDone.Contains("done") Then Return
+        ArtHintDone.Add("done")
+        Try
+            Dim HintPath = Paths.Base & "PCL\Pictures\主题立绘\使用说明.txt"
+            Directory.CreateDirectory(IO.Path.GetDirectoryName(HintPath))
+            IO.File.WriteAllText(HintPath,
+                "【幻星修改版 · 主题立绘使用说明】" & vbCrLf &
+                "把角色立绘图片放进对应主题的文件夹即可自动展示，多张会随机选用：" & vbCrLf &
+                "  原神 → PCL\Pictures\主题立绘\原神\" & vbCrLf &
+                "  星空 → PCL\Pictures\主题立绘\星空\" & vbCrLf &
+                "  四季 → PCL\Pictures\主题立绘\四季\" & vbCrLf &
+                "  娱乐 → PCL\Pictures\主题立绘\娱乐\" & vbCrLf & vbCrLf &
+                "图片要求：" & vbCrLf &
+                "  1. 推荐【透明背景的竖版 PNG 立绘】（角色抠图）；JPG 会带不透明白底，观感较差" & vbCrLf &
+                "  2. 建议宽高比约 1:1.5 ～ 1:2.5 的竖版，高度 800 像素以上，单文件小于 20MB" & vbCrLf &
+                "  3. 支持格式：PNG / JPG / BMP / WebP" & vbCrLf &
+                "  4. 立绘显示在启动器背景右侧，自动等比缩放，带入场动画与轻微摇曳" & vbCrLf &
+                "  5. 添加或更换图片后，重新切换一次主题即可刷新" & vbCrLf &
+                "  6. 若设置了背景图片，动态夜幕会让位给背景图，但立绘仍会展示" & vbCrLf & vbCrLf &
+                "注意：请遵守图片作品的授权条款，不要随启动器分发未授权的图片。" & vbCrLf,
+                System.Text.Encoding.UTF8)
+        Catch ex As Exception
+            Logger.Warn(ex, "写入主题立绘使用说明失败")
         End Try
     End Sub
 
@@ -211,15 +275,21 @@ Friend Module ModThemeFx
         If ThemeArt Is Nothing OrElse ThemeArt.Source Is Nothing Then Return
         Dim H = FxCanvas.ActualHeight, W = FxCanvas.ActualWidth
         If H < 120 OrElse W < 240 Then Return
+        If ArtAppear < 1 Then ArtAppear = Math.Min(1, ArtAppear + FrameDt / 0.9)
+        Dim Ease = 1 - (1 - ArtAppear) * (1 - ArtAppear) 'easeOut 二次缓动
         Dim Scale = Math.Min(H * 0.95 / ThemeArt.Source.Height, W * 0.52 / ThemeArt.Source.Width)
         If Scale <= 0 OrElse Double.IsInfinity(Scale) OrElse Double.IsNaN(Scale) Then Return
         Dim TargetW = ThemeArt.Source.Width * Scale
         Dim TargetH = ThemeArt.Source.Height * Scale
         ThemeArt.Width = TargetW
         ThemeArt.Height = TargetH
-        Dim Bob = Math.Sin(LastTime.TotalSeconds * 1.1) * 5 '轻微呼吸浮动
+        Dim Bob = Math.Sin(LastTime.TotalSeconds * 1.1) * 5 '呼吸浮动
+        Dim Sway = Math.Sin(LastTime.TotalSeconds * 0.7) * 1.5 '轻微摇曳（度）
+        Dim ArtRotate = TryCast(ThemeArt.RenderTransform, RotateTransform)
+        If ArtRotate IsNot Nothing Then ArtRotate.Angle = Sway
+        ThemeArt.Opacity = 0.97 * Ease
         Canvas.SetLeft(ThemeArt, W - TargetW - 14)
-        Canvas.SetTop(ThemeArt, H - TargetH + 10 + Bob)
+        Canvas.SetTop(ThemeArt, H - TargetH + 10 + Bob + (1 - Ease) * 42) '入场时自下而上浮现
     End Sub
 
 #End Region
@@ -289,6 +359,7 @@ Friend Module ModThemeFx
             FxCanvas.Background = Nothing
         End If
         ThemeArt = Nothing
+        LastArtStyle = -2
         ClearParticles()
         LastStyle = -1
     End Sub
@@ -312,6 +383,7 @@ Friend Module ModThemeFx
             Dim Args = CType(e, RenderingEventArgs)
             Dim Dt As Double = (Args.RenderingTime - LastTime).TotalSeconds
             LastTime = Args.RenderingTime
+            FrameDt = Dt
             If Dt <= 0 OrElse Dt >= 0.5 Then Return '首帧或窗口挂起恢复
             Dim W As Double = If(FxCanvas.ActualWidth < 50, 900, FxCanvas.ActualWidth)
             Dim H As Double = If(FxCanvas.ActualHeight < 50, 560, FxCanvas.ActualHeight)
