@@ -68,6 +68,7 @@ Friend Module ModSecret
         Try
             If ThemeNow = NewTheme AndAlso NewTheme >= 0 Then Return
             If NewTheme >= 0 Then ThemeNow = NewTheme
+            ModThemeHuanXing.ApplyTheme(ThemeNow) '幻星修改版：应用主题色相映射与粒子特效
 
             Color1 = New MyColor().FromHSL2(ColorHue, ColorSat * 0.2, 25 + ColorLightAdjust * 0.3)
             Color2 = New MyColor().FromHSL2(ColorHue, ColorSat, 45 + ColorLightAdjust)

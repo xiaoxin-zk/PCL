@@ -429,7 +429,7 @@ Public Class FormMain
             Telemetry("启动")
             '开源版本提示
             If VersionBranchMain = "OpenSource" Then
-                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后添加到 ModSecret.vb 的开头{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后添加到 ModSecret.vb 的开头{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 主题切换：这是需要赞助解锁的纪念性质的功能，别让赞助者太伤心啦……{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……", "开源版本说明")
+                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后添加到 ModSecret.vb 的开头{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后添加到 ModSecret.vb 的开头{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……{vbCrLf}{vbCrLf}幻星修改版说明：本版本是基于 PCL 开源代码的第三方修改版，全部主题预设与粒子特效免费开放，与 PCL 官方版本无关；问题反馈请前往幻星修改版自己的仓库，不要打扰 PCL 官方。", "幻星修改版（基于开源代码构建）")
             End If
         End Sub, "初始化", ThreadPriority.Lowest)
 
@@ -603,7 +603,7 @@ Public Class FormMain
         If ReturnCode = ProcessReturnValues.Exception Then
             If Not IsLogShown Then
                 FeedbackInfo()
-                Logger.Info("请在 https://github.com/Meloong-Git/PCL/issues 提交错误报告，以便于作者解决此问题！")
+                Logger.Info("请在 https://github.com/xiaoxin-zk/PCL/issues 提交错误报告（幻星修改版的问题请勿提交至 PCL 官方仓库），以便于维护者解决此问题！")
                 IsLogShown = True
                 StartProcess(Paths.Base & "PCL\Log1.txt")
             End If

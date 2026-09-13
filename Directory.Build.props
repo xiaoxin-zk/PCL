@@ -1,0 +1,7 @@
+<Project>
+  <!-- 幻星修改版构建辅助：为 net48 目标提供引用程序集，免去安装 .NET Framework 4.8 Developer Pack。
+       仅影响编译期引用解析，不改变运行时行为。 -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" PrivateAssets="All" Version="1.0.3" />
+  </ItemGroup>
+</Project>

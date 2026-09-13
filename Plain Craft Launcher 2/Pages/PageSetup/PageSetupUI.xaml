@@ -38,7 +38,7 @@
                             <local:MySlider local:SettingService.Key="UiLauncherLight" 
                                             Grid.Row="2" Grid.Column="4" x:Name="SliderLauncherLight" Visibility="Collapsed" MaxValue="40" ValueByKey="5" Margin="0,10,0,0" />
                         </Grid>
-                        <Grid x:Name="PanLauncherTheme" Height="90" Margin="0,0,0,7">
+                        <Grid x:Name="PanLauncherTheme" Height="118" Margin="0,0,0,7">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Name1" />
                                 <ColumnDefinition />
@@ -48,6 +48,7 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
+                                <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
                                 <RowDefinition />
@@ -89,6 +90,15 @@
                             <TextBlock Grid.Column="4" Grid.Row="2" x:Name="LabLauncherTheme11Click" Background="{StaticResource ColorBrushSemiTransparent}" />
                             <local:MyRadioBox local:SettingService.Key="UiLauncherTheme" local:SettingService.Value="14" 
                                               Grid.Column="5" Grid.Row="2" Text="自定义" x:Name="RadioLauncherTheme14" IsEnabled="False" ToolTip="需要解锁五个隐藏主题" ToolTipService.ShowOnDisabled="True" />
+                            <!-- 幻星修改版：新增主题预设（免费开放） -->
+                            <local:MyRadioBox local:SettingService.Key="UiLauncherTheme" local:SettingService.Value="15" 
+                                              Grid.Column="1" Grid.Row="3" Text="原神" x:Name="RadioLauncherTheme15" ToolTip="提瓦特的流金色辉，伴元素光尘升起" />
+                            <local:MyRadioBox local:SettingService.Key="UiLauncherTheme" local:SettingService.Value="16" 
+                                              Grid.Column="2" Grid.Row="3" Text="星空" x:Name="RadioLauncherTheme16" ToolTip="深空蓝调配流转群星，点击窗口可见星星迸发" />
+                            <local:MyRadioBox local:SettingService.Key="UiLauncherTheme" local:SettingService.Value="17" 
+                                              Grid.Column="3" Grid.Row="3" Text="四季" x:Name="RadioLauncherTheme17" ToolTip="随现实季节变换配色：春樱、夏萤、秋叶、冬雪" />
+                            <local:MyRadioBox local:SettingService.Key="UiLauncherTheme" local:SettingService.Value="18" 
+                                              Grid.Column="4" Grid.Row="3" Text="娱乐" x:Name="RadioLauncherTheme18" ToolTip="彩虹流转、彩带纷飞的欢乐模式" />
                         </Grid>
                         <local:MyCheckBox local:SettingService.Key="UiLauncherLogo" Text="打开启动器时显示 PCL 图标" Margin="-1,0,0,1" Height="22" />
                     </StackPanel>
@@ -100,6 +110,39 @@
                         </StackPanel>
                     </Border>
                 </Grid>
+            </local:MyCard>
+            <!-- 幻星修改版：主题特效设置 -->
+            <local:MyCard x:Name="CardFx" Margin="0,0,0,15" Title="主题特效（幻星修改版）">
+                <StackPanel Margin="25,40,25,20">
+                    <Grid Height="28" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="NameFx" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="特效密度" Margin="0,0,20,0" />
+                        <local:MyComboBox local:SettingService.Key="UiFxLevel" Grid.Column="1" MaxWidth="200" HorizontalAlignment="Left">
+                            <local:MyComboBoxItem local:SettingService.Value="0" Content="关闭（推荐低配置设备）" />
+                            <local:MyComboBoxItem local:SettingService.Value="1" Content="低" />
+                            <local:MyComboBoxItem local:SettingService.Value="2" Content="中（默认）" />
+                            <local:MyComboBoxItem local:SettingService.Value="3" Content="高" />
+                        </local:MyComboBox>
+                    </Grid>
+                    <Grid Height="28" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="NameFx" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" Text="粒子大小" Margin="0,0,20,0" />
+                        <local:MyComboBox local:SettingService.Key="UiFxSize" Grid.Column="1" MaxWidth="200" HorizontalAlignment="Left">
+                            <local:MyComboBoxItem local:SettingService.Value="1" Content="很小" />
+                            <local:MyComboBoxItem local:SettingService.Value="2" Content="较小" />
+                            <local:MyComboBoxItem local:SettingService.Value="3" Content="适中（默认）" />
+                            <local:MyComboBoxItem local:SettingService.Value="4" Content="较大" />
+                            <local:MyComboBoxItem local:SettingService.Value="5" Content="很大" />
+                        </local:MyComboBox>
+                    </Grid>
+                    <TextBlock Text="点击启动器窗口任意位置可触发星星迸发特效；特效可能导致低性能设备卡顿，帧率过低时会自动减少粒子。选择“星空”等主题可体验对应的动态特效。" TextWrapping="Wrap" Foreground="{StaticResource ColorBrushGray3}" FontSize="12.5" />
+                </StackPanel>
             </local:MyCard>
             <local:MyCard x:Name="CardBackground" Margin="0,0,0,15" Title="背景图片">
                 <StackPanel Margin="25,40,25,20">

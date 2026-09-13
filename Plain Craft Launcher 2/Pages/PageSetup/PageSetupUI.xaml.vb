@@ -36,6 +36,9 @@ Public Class PageSetupUI
         If Not RadioLauncherTheme9.IsEnabled Then LabLauncherTheme9Copy.ToolTip = "· 反馈一个 Bug，在标记为 [完成] 后回复识别码要求解锁（右键打开反馈页面）" & vbCrLf & "· 提交一个 Pull Request 或主页预设，在标记为 [完成] 后回复识别码要求解锁"
         RadioLauncherTheme9.ToolTip = "· 反馈一个 Bug，在标记为 [完成] 后回复识别码要求解锁" & vbCrLf & "· 提交一个 Pull Request 或主页预设，在标记为 [完成] 后回复识别码要求解锁"
         '极客蓝的处理在 ThemeCheck 中
+        '幻星修改版：自定义主题免费开放，无需解锁隐藏主题
+        RadioLauncherTheme14.IsEnabled = True
+        RadioLauncherTheme14.ToolTip = "自由调节色调、饱和度与亮度，属于你的专属主题"
 
     End Sub
     Public Sub Refresh()

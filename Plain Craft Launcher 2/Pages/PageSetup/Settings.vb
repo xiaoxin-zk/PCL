@@ -135,6 +135,8 @@ Public Class Settings
         New Setting("UiLauncherTheme", 0, OnChanged:=AddressOf ThemeRefresh),
         New Setting("UiLauncherThemeHide", "0|1|2|3|4", Source:=Sources.Registry, Encrypted:=True),
         New Setting("UiLauncherThemeHide2", "0|1|2|3|4", Source:=Sources.Registry, Encrypted:=True),
+        New Setting("UiFxLevel", 2, OnChanged:=Sub(Value As Integer) ModThemeFx.FxRefresh()), '幻星修改版：特效密度（0 关闭）
+        New Setting("UiFxSize", 3, OnChanged:=Sub(Value As Integer) ModThemeFx.FxRefresh()), '幻星修改版：粒子大小
         New Setting("UiLauncherLogo", True),
         New Setting("UiLauncherEmail", False),
         New Setting("UiBackgroundColorful", True, OnChanged:=Sub() ThemeRefresh()), '不传入参数
