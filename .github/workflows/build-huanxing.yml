@@ -1,0 +1,74 @@
+name: 构建幻星修改版
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [huanxing-mod]
+
+jobs:
+  build:
+    name: 构建幻星修改版
+    runs-on: windows-latest
+    steps:
+      - name: 检出代码（含 MeloongCore 子模块）
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 写入版本描述
+        shell: bash
+        run: echo "describe=$(git describe --tags --always)" >> $GITHUB_ENV
+
+      - name: 安装 .NET SDK 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: 配置 MSBuild
+        uses: microsoft/setup-msbuild@v3
+        with:
+          msbuild-architecture: x64
+
+      - name: 更新帮助文档包
+        shell: pwsh
+        run: |
+          Set-Location ..
+          git clone https://github.com/LTCatt/PCL2Help.git -b master --single-branch --depth 1
+          Set-Location PCL2Help
+          Compress-Archive -Path .\* -DestinationPath .\Help.zip -Force
+          Copy-Item -Path .\Help.zip -Destination "${{ GITHUB.WORKSPACE }}\Plain Craft Launcher 2\Resources\Help.zip" -Force
+          Set-Location ..
+          Remove-Item PCL2Help -Recurse -Force
+          Set-Location ${{ GITHUB.WORKSPACE }}
+
+      - name: 编译 C# 支持库（MeloongCore / MeloongCore.Wpf / PCLCS）
+        run: |
+          dotnet build MeloongCore/Shared/MeloongCore.csproj -c Debug --nologo
+          dotnet build MeloongCore/Wpf/MeloongCore.Wpf.csproj -c Debug --nologo
+          dotnet build PCLCS/PCLCS.csproj -c Debug --nologo
+
+      - name: 编译主程序（VB.NET / WPF）
+        run: msbuild "Plain Craft Launcher 2\Plain Craft Launcher 2.vbproj" -p:Configuration=Debug -p:BuildProjectReferences=false -nologo -v:m
+
+      - name: 注入登录与资源密钥（在仓库 Secrets 配置 MS_CLIENT_ID / CURSEFORGE_API_KEY 后自动生效）
+        env:
+          HX_MS_CLIENT_ID: ${{ secrets.MS_CLIENT_ID }}
+          HX_CURSEFORGE_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
+        if: env.HX_MS_CLIENT_ID != '' || env.HX_CURSEFORGE_KEY != ''
+        shell: bash
+        run: |
+          mkdir -p "Plain Craft Launcher 2/bin/PCL"
+          {
+            [ -n "$HX_MS_CLIENT_ID" ] && echo "MS_CLIENT_ID=$HX_MS_CLIENT_ID"
+            [ -n "$HX_CURSEFORGE_KEY" ] && echo "CURSEFORGE_API_KEY=$HX_CURSEFORGE_KEY"
+          } > "Plain Craft Launcher 2/bin/PCL/AuthOptions.txt"
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: PCL-HuanXing-${{ env.describe }}
+          if-no-files-found: error
+          path: |
+            Plain Craft Launcher 2/bin/**
+            !Plain Craft Launcher 2/bin/PCL/**
+            Plain Craft Launcher 2/bin/PCL/AuthOptions.txt

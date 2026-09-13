@@ -6,10 +6,39 @@ Friend Module ModSecret
     Public Const VersionBranchMain As String = "OpenSource"
     '在开源版的注册表与常规版的注册表隔离，以防数据冲突
     Public Const RegFolder As String = "PCLDebug"
-    '用于微软登录的 ClientId
-    Public OAuthClientId As String = If(Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID"), "")
-    'CurseForge API Key
-    Public CurseForgeAPIKey As String = If(Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"), "")
+    '用于微软登录的 ClientId 与 CurseForge API Key
+    '幻星修改版：读取顺序为环境变量 → PCL\AuthOptions.txt（CI 构建时由仓库 Secrets 注入该文件，密钥不进源码）
+    Private _OAuthClientId As String = Nothing
+    Public ReadOnly Property OAuthClientId As String
+        Get
+            If _OAuthClientId Is Nothing Then _OAuthClientId = If(Environment.GetEnvironmentVariable("PCL_MS_CLIENT_ID"), ReadAuthOption("MS_CLIENT_ID"))
+            Return _OAuthClientId
+        End Get
+    End Property
+    Private _CurseForgeAPIKey As String = Nothing
+    Public ReadOnly Property CurseForgeAPIKey As String
+        Get
+            If _CurseForgeAPIKey Is Nothing Then _CurseForgeAPIKey = If(Environment.GetEnvironmentVariable("PCL_CURSEFORGE_API_KEY"), ReadAuthOption("CURSEFORGE_API_KEY"))
+            Return _CurseForgeAPIKey
+        End Get
+    End Property
+
+    ''' <summary>从 PCL\AuthOptions.txt 读取密钥配置，每行一条：键=值。</summary>
+    Private Function ReadAuthOption(Key As String) As String
+        Try
+            Dim OptionPath = Paths.Base & "PCL\AuthOptions.txt"
+            If Not IO.File.Exists(OptionPath) Then Return ""
+            For Each Line In IO.File.ReadAllLines(OptionPath)
+                Dim Separator As Integer = Line.IndexOf("="c)
+                If Separator > 0 AndAlso Line.Substring(0, Separator).Trim().Equals(Key, StringComparison.OrdinalIgnoreCase) Then
+                    Return Line.Substring(Separator + 1).Trim()
+                End If
+            Next
+        Catch ex As Exception
+            Logger.Warn(ex, "读取 AuthOptions.txt 失败")
+        End Try
+        Return ""
+    End Function
     '用于匿名数据收集的腾讯云日志服务上报 URL，形如 https://{region}.cls.tencentcs.com/track?topic_id={topic_id}
     Public Const ClsBaseUrl As String = ""
 

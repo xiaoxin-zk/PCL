@@ -429,7 +429,7 @@ Public Class FormMain
             Telemetry("启动")
             '开源版本提示
             If VersionBranchMain = "OpenSource" Then
-                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，然后添加到 ModSecret.vb 的开头{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，然后添加到 ModSecret.vb 的开头{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……{vbCrLf}{vbCrLf}幻星修改版说明：本版本是基于 PCL 开源代码的第三方修改版，全部主题预设与粒子特效免费开放，与 PCL 官方版本无关；问题反馈请前往幻星修改版自己的仓库，不要打扰 PCL 官方。", "幻星修改版（基于开源代码构建）")
+                MyMsgBox($"该版本中无法使用以下特性：{vbCrLf}- CurseForge API 调用：需要自行申请 API Key，写入 PCL\AuthOptions.txt（CURSEFORGE_API_KEY=你的Key）或设为环境变量{vbCrLf}- 正版登录：需要自行向微软申请 Client ID，写入 PCL\AuthOptions.txt（MS_CLIENT_ID=你的ID）或设为环境变量{vbCrLf}- 更新与联网通知：避免滥用隐患{vbCrLf}- 百宝箱：开发早期往里面塞了些开发工具，整理起来太麻烦了……{vbCrLf}{vbCrLf}幻星修改版说明：本版本是基于 PCL 开源代码的第三方修改版，全部主题预设与粒子特效免费开放，与 PCL 官方版本无关；问题反馈请前往幻星修改版自己的仓库，不要打扰 PCL 官方。", "幻星修改版（基于开源代码构建）")
             End If
         End Sub, "初始化", ThreadPriority.Lowest)
 
